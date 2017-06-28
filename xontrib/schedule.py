@@ -18,7 +18,7 @@ class SchedJob:
         self._amount = amount
 
     def do(self, func, *pargs, **kwargs):
-        self._method(self.amount, 0, func, pargs, kwargs)
+        self._method(self._amount, 0, func, pargs, kwargs)
 
 
 class AbstractScheduler:
@@ -45,8 +45,8 @@ class AbstractScheduler:
             else:
                 self._delay(min(nextsched, nextschedule))
 
-    def every(self):
-        return _schedule.every()
+    def every(self, *pargs):
+        return _schedule.every(*pargs)
 
     def when(self, when):
         if isinstance(when, datetime.datetime):
@@ -67,11 +67,24 @@ class SleepScheduler(AbstractScheduler):
 
 
 class PosixTimerScheduler(AbstractScheduler):
+    def __init__(self):
+        super().__init__()
+        self._finished = threading.Event()
+
+    def _signalled(self):
+        self._finished.set()
+
     def _delay(self, amount):
-        time.sleep(max(amount, self.MAX_WAIT))
+        prev = signal.signal(signal.SIGALRM, self._signalled)
+        try:
+            signal.setitimer(signal.ITIMER_REAL, amount)
+            self._finished.wait()
+            self._finished.clear()
+        finally:
+            signal.signal(signal.SIGALRM, prev)
 
 
 if hasattr(signal, 'setitimer'):
-    builtins.schedule = SleepScheduler()
+    builtins.schedule = PosixTimerScheduler()
 else:
     builtins.schedule = SleepScheduler()
