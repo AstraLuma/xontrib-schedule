@@ -9,6 +9,17 @@ import datetime
 __all__ = ()
 __version__ = '0.0.1'
 
+Inf = float('inf')
+
+
+class SchedJob:
+    def __init__(self, method, amount):
+        self._method = method
+        self._amount = amount
+
+    def do(self, func, *pargs, **kwargs):
+        self._method(self.amount, 0, func, pargs, kwargs)
+
 
 class AbstractScheduler:
     def __init__(self):
@@ -22,14 +33,14 @@ class AbstractScheduler:
 
             nextsched = self.sched.run(False)
             if nextsched is None:
-                nextsched = float('inf')
+                nextsched = Inf
 
             try:
                 nextschedule = _schedule.idle_seconds()
             except Exception:
-                nextschedule = float('inf')
+                nextschedule = Inf
 
-            if nextsched == nextschedule == float('inf'):
+            if nextsched == nextschedule == Inf:
                 self._delay(1)  # Finish init
             else:
                 self._delay(min(nextsched, nextschedule))
@@ -37,15 +48,15 @@ class AbstractScheduler:
     def every(self):
         return _schedule.every()
 
-    def when(self, when, func, *pargs, **kwargs):
+    def when(self, when):
         if isinstance(when, datetime.datetime):
             when = when.timestamp()
-        self.sched.enterabs(when, 0, func, pargs, kwargs)
+        return SchedJob(self.sched.enterabs, when)
 
-    def delay(self, delay, func, *pargs, **kwargs):
+    def delay(self, delay):
         if isinstance(delay, datetime.timedelta):
             delay = delay.total_seconds()
-        self.sched.enter(delay, 0, func, pargs, kwargs)
+        return SchedJob(self.sched.enter, delay)
 
 
 class SleepScheduler(AbstractScheduler):
