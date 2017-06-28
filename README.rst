@@ -21,7 +21,7 @@ To install use pip:
 Or clone the repo:
 
     $ git clone https://github.com/astronouth7303/xontrib-schedule.git
-    $ python setup.py install
+    $ pip install ./xontrib-schedule
 
 And then load it:
 

@@ -3,12 +3,13 @@ import threading
 import sched
 import time
 import schedule as _schedule
+import signal
 
 __all__ = ()
 __version__ = '0.0.1'
 
 
-class ScheduleThread(threading.Thread):
+class AbstractScheduler(threading.Thread):
     def __init__(self, *pargs, **kwargs):
         super().__init__(*pargs, daemon=True, name="scheduler", **kwargs)
         self.sched = sched.scheduler(time.time, time.sleep)
@@ -27,9 +28,9 @@ class ScheduleThread(threading.Thread):
                 nextschedule = float('inf')
 
             if nextsched == nextschedule == float('inf'):
-                time.sleep(1)  # Finish init
+                self._delay(1)  # Finish init
             else:
-                time.sleep(max(min(nextsched, nextschedule), self.MAX_WAIT))
+                self._delay(min(nextsched, nextschedule))
 
     def every(self):
         return _schedule.every()
@@ -41,5 +42,16 @@ class ScheduleThread(threading.Thread):
         self.sched.enter(delay, 0, callable, pargs, kwargs)
 
 
-builtins.schedule = ScheduleThread()
+class SleepScheduler(AbstractScheduler):
+    MAX_WAIT = 60
+
+    def _delay(self, amount):
+        time.sleep(max(amount, self.MAX_WAIT))
+
+
+if hasattr(signal, 'setitimer'):
+    builtins.schedule = SleepScheduler()
+else:
+    builtins.schedule = SleepScheduler()
+
 builtins.schedule.start()
