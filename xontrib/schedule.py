@@ -3,7 +3,6 @@ import threading
 import sched
 import time
 import schedule as _schedule
-import signal
 import datetime
 import pause
 
