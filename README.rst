@@ -15,13 +15,13 @@ Installation / Usage
 
 To install use pip:
 
-    $ pip install xontrib-schedule
+    $ xip install xontrib-schedule
 
 
 Or clone the repo:
 
     $ git clone https://github.com/astronouth7303/xontrib-schedule.git
-    $ pip install ./xontrib-schedule
+    $ xip install ./xontrib-schedule
 
 And then load it:
 
