@@ -84,7 +84,7 @@ class PosixTimerScheduler(AbstractScheduler):
             signal.signal(signal.SIGALRM, prev)
 
 
-if hasattr(signal, 'setitimer'):
+if hasattr(signal, 'setitimer') and False:
     builtins.schedule = PosixTimerScheduler()
 else:
     builtins.schedule = SleepScheduler()
