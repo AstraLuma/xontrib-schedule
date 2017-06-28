@@ -8,7 +8,7 @@ setup(
     author='Jamie Bliss',
     author_email='astronouth7303@gmail.com',
     description='Xonsh Task Scheduling',
-    install_requires=['schedule'],
+    install_requires=['schedule', 'pause'],
     packages=['xontrib'],
     package_dir={'xontrib': 'xontrib'},
     package_data={'xontrib': ['*.xsh']},

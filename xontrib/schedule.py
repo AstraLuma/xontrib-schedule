@@ -5,6 +5,7 @@ import time
 import schedule as _schedule
 import signal
 import datetime
+import pause
 
 __all__ = ()
 __version__ = '0.0.1'
@@ -21,10 +22,10 @@ class SchedJob:
         self._method(self._amount, 0, func, pargs, kwargs)
 
 
-class AbstractScheduler:
+class Scheduler:
     def __init__(self):
         self._thread = threading.Thread(daemon=True, name="scheduler", target=self._run)
-        self.sched = sched.scheduler(time.time, time.sleep)
+        self.sched = sched.scheduler(time.time, pause.seconds)
         self._thread.start()
 
     def _run(self):
@@ -58,33 +59,10 @@ class AbstractScheduler:
             delay = delay.total_seconds()
         return SchedJob(self.sched.enter, delay)
 
-
-class SleepScheduler(AbstractScheduler):
     MAX_WAIT = 60
 
     def _delay(self, amount):
-        time.sleep(max(amount, self.MAX_WAIT))
+        pause.seconds(amount)
 
 
-class PosixTimerScheduler(AbstractScheduler):
-    def __init__(self):
-        super().__init__()
-        self._finished = threading.Event()
-
-    def _signalled(self):
-        self._finished.set()
-
-    def _delay(self, amount):
-        prev = signal.signal(signal.SIGALRM, self._signalled)
-        try:
-            signal.setitimer(signal.ITIMER_REAL, amount)
-            self._finished.wait()
-            self._finished.clear()
-        finally:
-            signal.signal(signal.SIGALRM, prev)
-
-
-if hasattr(signal, 'setitimer') and False:
-    builtins.schedule = PosixTimerScheduler()
-else:
-    builtins.schedule = SleepScheduler()
+builtins.schedule = Scheduler()
