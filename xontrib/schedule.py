@@ -4,6 +4,7 @@ import sched
 import time
 import schedule as _schedule
 import signal
+import datetime
 
 __all__ = ()
 __version__ = '0.0.1'
@@ -35,11 +36,15 @@ class AbstractScheduler(threading.Thread):
     def every(self):
         return _schedule.every()
 
-    def when(self, time, callable, *pargs, **kwargs):
-        self.sched.enterabs(time, 0, callable, pargs, kwargs)
+    def when(self, when, func, *pargs, **kwargs):
+        if isinstance(when, datetime.datetime):
+            when = when.timestamp()
+        self.sched.enterabs(when, 0, func, pargs, kwargs)
 
-    def delay(self, delay, callable, *pargs, **kwargs):
-        self.sched.enter(delay, 0, callable, pargs, kwargs)
+    def delay(self, delay, func, *pargs, **kwargs):
+        if isinstance(delay, datetime.timedelta):
+            delay = delay.total_seconds()
+        self.sched.enter(delay, 0, func, pargs, kwargs)
 
 
 class SleepScheduler(AbstractScheduler):
