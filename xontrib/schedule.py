@@ -10,12 +10,13 @@ __all__ = ()
 __version__ = '0.0.1'
 
 
-class AbstractScheduler(threading.Thread):
-    def __init__(self, *pargs, **kwargs):
-        super().__init__(*pargs, daemon=True, name="scheduler", **kwargs)
+class AbstractScheduler:
+    def __init__(self):
+        self._thread = threading.Thread(daemon=True, name="scheduler", target=self._run)
         self.sched = sched.scheduler(time.time, time.sleep)
+        self._thread.start()
 
-    def run(self):
+    def _run(self):
         while True:
             _schedule.run_pending()
 
@@ -54,9 +55,12 @@ class SleepScheduler(AbstractScheduler):
         time.sleep(max(amount, self.MAX_WAIT))
 
 
+class PosixTimerScheduler(AbstractScheduler):
+    def _delay(self, amount):
+        time.sleep(max(amount, self.MAX_WAIT))
+
+
 if hasattr(signal, 'setitimer'):
     builtins.schedule = SleepScheduler()
 else:
     builtins.schedule = SleepScheduler()
-
-builtins.schedule.start()
