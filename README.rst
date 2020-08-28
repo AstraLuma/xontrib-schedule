@@ -20,7 +20,7 @@ To install use pip:
 
 Or clone the repo:
 
-    $ git clone https://github.com/astronouth7303/xontrib-schedule.git
+    $ git clone https://github.com/AstraLuma/xontrib-schedule.git
     $ xip install ./xontrib-schedule
 
 And then load it:
