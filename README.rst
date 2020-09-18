@@ -1,31 +1,35 @@
-xontrib-schedule
-===============================
+**xontrib-schedule** defines the ``schedule`` builtin, which is strongly based on schedule_ with some
+additions for non-periodic tasks.
 
-Defines the ``schedule`` builtin, which is strongly based on schedule_ with some
-additions for non-periodic tasks:
+Installation
+------------
+
+To install use pip:
+
+.. code-block:: bash
+
+    xpip install xontrib-schedule  # or from git: xpip install git+https://github.com/AstraLuma/xontrib-schedule
+    # and load:
+    xontrib load schedule
+
+Usage
+-----
 
 ``schedule.when(<time>).do()`` performs a task at some absolute time in the future.
 
 ``schedule.delay(<time>).do()`` performs a task after a delay.
 
-This module prioritizes task execution over accurate timing.
 
-Installation / Usage
---------------------
+Example
+-------
 
-To install use pip:
+.. code-block:: bash
 
-    $ xip install xontrib-schedule
+    schedule.delay(5).do(lambda: print('hello!'))
+    # wait 5 sec
+    hello!
+    
 
-
-Or clone the repo:
-
-    $ git clone https://github.com/AstraLuma/xontrib-schedule.git
-    $ xip install ./xontrib-schedule
-
-And then load it:
-
-    $ xontrib load schedule
 
 Contributing
 ------------
